@@ -8,10 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
-      - name: Checkout DJO Guitar Studio
+      - name: Checkout project
         uses: actions/checkout@v4
 
       - name: Checkout JUCE
@@ -23,21 +23,22 @@ jobs:
       - name: Install CMake
         run: brew install cmake
 
-      - name: Configure plugin
+      - name: Configure
         run: |
           cmake -S . -B build \
             -DJUCE_DIR="$GITHUB_WORKSPACE/JUCE" \
             -DCMAKE_BUILD_TYPE=Release
 
-      - name: Compile AU and VST3
+      - name: Build plugin
         run: |
           cmake --build build \
             --config Release \
             --parallel 2
 
-      - name: Upload compiled plugins
+      - name: Upload plugins
         uses: actions/upload-artifact@v4
         with:
-          name: DJO-Guitar-Studio-Mac-Plugins
+          name: DJO-Guitar-Studio
           path: build/DJOGuitarStudio_artefacts/Release/
           if-no-files-found: error
+
