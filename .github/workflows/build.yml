@@ -1,0 +1,43 @@
+
+name: Build DJO Guitar Studio
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout DJO Guitar Studio
+        uses: actions/checkout@v4
+
+      - name: Checkout JUCE
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          path: JUCE
+
+      - name: Install CMake
+        run: brew install cmake
+
+      - name: Configure plugin
+        run: |
+          cmake -S . -B build \
+            -DJUCE_DIR="$GITHUB_WORKSPACE/JUCE" \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile AU and VST3
+        run: |
+          cmake --build build \
+            --config Release \
+            --parallel 2
+
+      - name: Upload compiled plugins
+        uses: actions/upload-artifact@v4
+        with:
+          name: DJO-Guitar-Studio-Mac-Plugins
+          path: build/DJOGuitarStudio_artefacts/Release/
+          if-no-files-found: error
